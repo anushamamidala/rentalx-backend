@@ -2,6 +2,7 @@ const Express = require("express");
 var request = require("request");
 const BodyParser = require("body-parser");
 const { MongoClient } = require("mongodb");
+const { min } = require("moment");
 
 var app = Express();
 app.use(BodyParser.json());
@@ -60,6 +61,8 @@ async function getData() {
             const rentalListing = res;
             if (rentalListing && rentalListing.length > 0) {
               rentalListing.forEach((rental) => {
+                const rentalAvg = (arr) =>
+                  arr.reduce((a, b) => a + b, 0) / arr.length;
                 let rentalObj = {
                   id: rental.id,
                   address: rental.address1,
@@ -69,6 +72,9 @@ async function getData() {
                   city: "Toronto", //get the city name with the help of Id
                   propertyType: rental.property_type,
                   rentRange: rental.rent_range,
+                  minPrice: Math.min(rental.rent_range),
+                  maxPrice: Math.max(rental.rent_range),
+                  avgPrice: rentalAvg(rental.rent_range),
                   bedsRange: rental.beds_range,
                   bathsRange: rental.baths_range,
                   dateUpdated: rental.updated,
@@ -79,8 +85,8 @@ async function getData() {
           }
         })
         .catch((error) => console.log("------------------------------"));
-      if (i % 40 === 0) {
-        await fallAsleep(1000 * 60);
+      if (i % 30 === 0) {
+        await fallAsleep(1000 * 60 * 5);
       }
     }
     try {
@@ -124,7 +130,7 @@ function doRequest(pgNo) {
     request(options, function (error, res, body) {
       try {
         const parsedBody = JSON.parse(JSON.stringify(body));
-        console.log(parsedBody);
+        //console.log(parsedBody);
         resolve(JSON.parse(body).data.listings);
       } catch (parseError) {
         console.log(parseError);
