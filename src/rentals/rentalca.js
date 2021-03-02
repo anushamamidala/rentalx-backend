@@ -1,10 +1,10 @@
 const Express = require("express");
-var request = require("request");
+const request = require("request");
 const BodyParser = require("body-parser");
 const { MongoClient } = require("mongodb");
-const { min } = require("moment");
+const app = Express();
+require("dotenv/config");
 
-var app = Express();
 app.use(BodyParser.json());
 app.use(
   BodyParser.urlencoded({
@@ -13,17 +13,16 @@ app.use(
 );
 var database, collection;
 
-const CONNECTION_URL =
-  "mongodb+srv://admin:admin@rentalcluster.thm22.mongodb.net/test?retryWrites=true&w=majority&useNewUrlParser=true&useUnifiedTopology=true";
-
 app.listen(5000, () => {
-  MongoClient.connect(CONNECTION_URL, (error, client) => {
+  MongoClient.connect(process.env.MONGO_CONNECT, (error, client) => {
     if (error) {
       throw error;
     }
-    database = client.db("test");
-    collection = database.collection("rentals");
-    console.log("Connected to `" + "test" + "`!");
+    database = client.db(process.env.DATABASE_NAME);
+    collection = database.collection(process.env.RENTALS_COLLECTION_NAME);
+    console.log(
+      `Connected to ${process.env.DATABASE_NAME} | ${process.env.RENTALS_COLLECTION_NAME}`
+    );
     getData();
   });
 });
