@@ -2,8 +2,10 @@ const express = require("express");
 const app = express();
 const appRoutes = require("./src/api-routes/index");
 require("dotenv/config");
+const { scheduleFetchJob } = require("./src/jobs/jobs");
 
 const body_parser = require("body-parser");
+scheduleFetchJob();
 
 app.use(body_parser.json());
 

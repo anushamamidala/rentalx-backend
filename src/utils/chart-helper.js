@@ -12,7 +12,9 @@ const getDates = (period) => {
 const getChartData = (records = [], period) => {
   let daysObj = getDates(period);
   for (let record of records) {
-    const currentDate = moment(record?.dateUpdated * 1000).format("MM/DD");
+    const currentDate = moment(record ? record.dateUpdated * 1000 : "").format(
+      "MM/DD"
+    );
     if (daysObj[currentDate] !== undefined) {
       daysObj[currentDate] += 1;
     }
