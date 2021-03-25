@@ -1,44 +1,42 @@
 // Required data id: rental.listing_id, address: rental.building_name, addressDetail: rental.address, postalCode: rental.zipcode, location: rental.neighborhood_name, city: rental.city, propertyType: rental.property_type, rentRange: [rental.min_price, rental.max_price], bedsRange: [rental.min_bedrooms, rental.max_bedrooms], bathsRange: rental.min_all_bathrooms, dateUpdated: rental.created_on,
 
-const axios = require("axios");
-const cheerio = require("cheerio");
+const axios = require('axios')
+const cheerio = require('cheerio')
 
-const links = [];
+const links = []
 
-const puppeteer = require("puppeteer");
+const puppeteer = require('puppeteer')
 
 const innerData = async function (link) {
-  let browser = await puppeteer.launch();
-  let page = await browser.newPage();
-  console.log(link);
+  let browser = await puppeteer.launch()
+  let page = await browser.newPage()
+  console.log(link)
   if (link) {
-    await page.goto(link);
-    let textContent = await page.content();
-    let $ = cheerio.load(textContent);
-    $(".featuredListing").each(function (id, elem) {
-      let roomLink = $(elem).attr("href");
-
-      console.log(roomLink);
-    });
+    await page.goto('https://' + link)
+    let textContent = await page.content()
+    let $ = cheerio.load(textContent)
+    $('.featuredListing').each(function (id, elem) {
+      let roomLink = $(elem).attr('href')
+      console.log(roomLink)
+    })
   }
-};
+}
 
-(async () => {
-  let browser = await puppeteer.launch();
-  let page = await browser.newPage();
+;(async () => {
+  let browser = await puppeteer.launch()
+  let page = await browser.newPage()
 
-  await page.goto("https://www.viewit.ca");
+  await page.goto('https://www.viewit.ca')
 
-  let textContent = await page.content();
-  let $ = cheerio.load(textContent);
-
-  $(".link").each(function (id, elem) {
-    let city = $(elem).attr("href");
+  let textContent = await page.content()
+  let $ = cheerio.load(textContent)
+  await browser.close()
+  $('.link').each(function (id, elem) {
+    let city = $(elem).attr('href')
 
     if (city != null) {
-      links.push(city.slice(2));
-      console.log(city.slice(2));
-      innerData(city.slice(2));
+      links.push(city.slice(2))
+      innerData(city.slice(2))
       // axios(city.slice(2))
       //   .then((response) => {
       //     if (response) {
@@ -51,12 +49,10 @@ const innerData = async function (link) {
       //     }
       //   });
     }
-  });
+  })
   /* No Problem Mate */
 
-  browser.close();
-  console.log("This is working");
-
+  browser.close()
   //   links.forEach(function(link, index){
   //       (async () => {
   //          browser = await puppeteer.launch();
@@ -65,6 +61,4 @@ const innerData = async function (link) {
   //         await page.goto("https:"+link);
   //       )();
   //   })
-})();
-
-console.log(links);
+})()
