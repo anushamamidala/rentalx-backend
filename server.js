@@ -3,6 +3,9 @@ const app = express();
 const appRoutes = require("./src/api-routes/index");
 require("dotenv/config");
 const { scheduleFetchJob } = require("./src/jobs/jobs");
+const cors = require('cors')
+
+app.use(cors())
 
 const body_parser = require("body-parser");
 scheduleFetchJob();

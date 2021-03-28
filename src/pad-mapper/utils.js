@@ -3,8 +3,8 @@ const constructItem = (item = {}) => {
   let address = item.address || "";
   let postalCode = item.zipcode || "";
   let city = item.city || "";
-  let minPrice = item.max_price || 0;
-  let maxPrice = item.min_price || 0;
+  let minPrice = item.min_price || 0;
+  let maxPrice = item.max_price || 0;
   let avgPrice = (minPrice + maxPrice) / 2;
   let bedsRange = [];
   if (item.min_bedrooms) {

@@ -3,7 +3,7 @@ const router = express.Router()
 const db = require('../db')
 const { fetchViewItData } = require('../viewit/view_it')
 const { fetchPadMapperData } = require('../pad-mapper/pad-mapper')
-const { getChartData } = require('../utils/chart-helper')
+const { getChartData, getOverallData } = require('../utils/chart-helper')
 require('dotenv/config')
 
 const routes = dbCollection => {
@@ -19,7 +19,7 @@ const routes = dbCollection => {
       chart_data: {}
     }
     for (let period of periods) {
-      let ONE_DAY = 24 * 60 * 60 * 1000
+      let ONE_DAY = (24) * 60 * 60 * 1000
       let days = period == 'today' ? 1 : period == 'week' ? 7 : 30
       let matchDate = new Date(Date.now() - days * ONE_DAY).getTime() / 1000
       let findObj = {
@@ -33,7 +33,8 @@ const routes = dbCollection => {
       let padMapperListings = await dbCollection.find(findObj).toArray()
       result.listings_count[period] = padMapperListings.length
       const chartData = getChartData(padMapperListings, period)
-      result.chart_data[period] = chartData
+      result.chart_data[period] = chartData;
+      result.overall_data = getOverallData(padMapperListings)
     }
     response.send(result)
   })
