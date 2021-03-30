@@ -36,13 +36,14 @@ const routes = dbCollection => {
         findObj.bedsRange = { $in: [noOfBedrooms] }
       }
       if (zipCode) {
-        findObj.postalCode =
+        const postalCode =
           zipCode.trim().toUpperCase().length === 3
             ? zipCode.trim().toUpperCase()
             : zipCode
                 .trim()
                 .toUpperCase()
                 .slice(0, 3)
+        findObj.postalCode = { $regex: '.*' + postalCode + '.*' }
       }
       console.log(findObj)
       let padMapperListings = await dbCollection
@@ -76,13 +77,14 @@ const routes = dbCollection => {
       findObj.bedsRange = { $in: [noOfBedrooms] }
     }
     if (zipCode) {
-      findObj.postalCode =
+      const postalCode =
         zipCode.trim().toUpperCase().length === 3
           ? zipCode.trim().toUpperCase()
           : zipCode
               .trim()
               .toUpperCase()
               .slice(0, 3)
+      findObj.postalCode = { $regex: '.*' + postalCode + '.*' }
     }
     console.log(findObj)
     const result = await dbCollection
