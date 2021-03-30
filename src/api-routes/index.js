@@ -13,13 +13,15 @@ const routes = dbCollection => {
   // cityName: Optional | Type: String | Values: ["Toronto", "Ottawa", "Vancouver"]
   router.post('/listings-count', async (request, response) => {
     const cityName = request.body.cityName
+    const noOfBedrooms = request.body.noOfBedrooms
+    const zipCode = request.body.zipCode
     let periods = ['today', 'week', 'month']
     let result = {
       listings_count: {},
       chart_data: {}
     }
     for (let period of periods) {
-      let ONE_DAY = (24) * 60 * 60 * 1000
+      let ONE_DAY = 24 * 60 * 60 * 1000
       let days = period == 'today' ? 1 : period == 'week' ? 7 : 30
       let matchDate = new Date(Date.now() - days * ONE_DAY).getTime() / 1000
       let findObj = {
@@ -30,10 +32,25 @@ const routes = dbCollection => {
       if (cityName) {
         findObj.city = cityName
       }
-      let padMapperListings = await dbCollection.find(findObj).toArray()
+      if (noOfBedrooms > 0) {
+        findObj.bedsRange = { $in: [noOfBedrooms] }
+      }
+      if (zipCode) {
+        findObj.postalCode =
+          zipCode.trim().toUpperCase().length === 3
+            ? zipCode.trim().toUpperCase()
+            : zipCode
+                .trim()
+                .toUpperCase()
+                .slice(0, 3)
+      }
+      console.log(findObj)
+      let padMapperListings = await dbCollection
+        .find(findObj, { bedsRange: 1 })
+        .toArray()
       result.listings_count[period] = padMapperListings.length
       const chartData = getChartData(padMapperListings, period)
-      result.chart_data[period] = chartData;
+      result.chart_data[period] = chartData
       result.overall_data = getOverallData(padMapperListings)
     }
     response.send(result)
@@ -42,8 +59,37 @@ const routes = dbCollection => {
   // Method : POST
   // Endpoint : BASE_URL/api/listings-price
   router.post('/listings-price', async (request, response) => {
+    let ONE_DAY = 24 * 60 * 60 * 1000
+    const cityName = request.body.cityName
+    const noOfBedrooms = request.body.noOfBedrooms
+    const zipCode = request.body.zipCode
+    let matchDate = new Date(Date.now() - 30 * ONE_DAY).getTime() / 1000
+    let findObj = {
+      dateUpdated: {
+        $gt: Math.floor(matchDate)
+      }
+    }
+    if (cityName) {
+      findObj.city = cityName
+    }
+    if (noOfBedrooms > 0) {
+      findObj.bedsRange = { $in: [noOfBedrooms] }
+    }
+    if (zipCode) {
+      findObj.postalCode =
+        zipCode.trim().toUpperCase().length === 3
+          ? zipCode.trim().toUpperCase()
+          : zipCode
+              .trim()
+              .toUpperCase()
+              .slice(0, 3)
+    }
+    console.log(findObj)
     const result = await dbCollection
       .aggregate([
+        {
+          $match: findObj
+        },
         {
           $group: {
             _id: '$city',
@@ -59,13 +105,13 @@ const routes = dbCollection => {
 
   // MARK: To be replaced with agenda
   router.get('/fetch', (req, res) => {
-    fetchPadMapperData(dbCollection)
-    res.send('Fetching data..')
+    let data = fetchPadMapperData(dbCollection)
+    res.send(data)
   })
 
   router.get('/fetchViewIt', (req, res) => {
-    fetchViewItData(dbCollection)
-    res.send('Fetching data..')
+    let data = fetchViewItData(dbCollection)
+    res.send(data)
   })
 }
 

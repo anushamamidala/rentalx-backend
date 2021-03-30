@@ -1,3 +1,4 @@
+const { lutimesSync } = require('fs')
 const request = require('request')
 require('dotenv/config')
 
@@ -14,7 +15,7 @@ const getBody = () => ({
   MapCenterLng: -79.49020385742189,
   MapZoom: 10,
   minPrice: 1,
-  maxPrice: 4000,
+  maxPrice: 50000,
   room: true,
   bachelor: false,
   room1: false,
@@ -71,7 +72,19 @@ async function getAllListings () {
   let allListings = await getViewItData()
   if (allListings.d) {
     for (const listing of allListings.d) {
-      console.log(listing)
+      let id = listing.iVit || ''
+      let address = listing.Address || ''
+      let postalCode = listing
+      let lat = listing.Latitude
+      let long = listing.Longitude
+      let city = listing.City
+      let minPrice = 0
+      let maxPrice = listing.Price
+      let avgPrice = listing.Price / 2
+      let bedsRange = listing.Bedroom === 0 ? 1 : listing.Bedroom
+      let bathsRange = ''
+      let dateUpdated = ''
+      let propertyType = 'Apartment'
     }
   } else {
     console.log('Unable  to get the data')
