@@ -1,145 +1,123 @@
-const request = require('request')
-const { formatPadMapperData } = require('./utils')
-require('dotenv/config')
+const request = require("request");
+const { formatPadMapperData } = require("./utils");
+const axios = require("axios");
+require("dotenv/config");
 
 const TOKEN_OPTIONS = {
-  method: 'GET',
-  url: process.env.PAD_MAPPER_API_TOKEN_URL
-}
+  method: "GET",
+  url: process.env.PAD_MAPPER_API_TOKEN_URL,
+};
 
-let collection
-let tokenObj = {}
+let collection;
+let tokenObj = {};
 
 const getHeaders = () => ({
-  'X-CSRFToken': tokenObj.csrf,
-  'Content-Type': 'application/json',
-  'X-Zumper-XZ-Token': tokenObj.xz_token
-})
+  "X-CSRFToken": tokenObj.csrf,
+  "Content-Type": "application/json",
+  "X-Zumper-XZ-Token": tokenObj.xz_token,
+});
 
 const getBody = (city, limit, offsetCount) => ({
   external: true,
-  longTerm: false,
+  longTerm: true,
   minPrice: 0,
-  shortTerm: false,
+  shortTerm: true,
   transits: {},
   url: city,
   featuredLimit: 3,
   matching: true,
   limit: limit || 1,
-  offsetCount: offsetCount || 0
-})
+  offset: offsetCount || 0,
+  propertyCategories: ["apartment", "condo", "house", "room"],
+});
 
 const getOptions = (city, limitCount, offsetCount) => ({
-  method: 'POST',
+  method: "POST",
   url: process.env.PAD_MAPPER_API_DATA_URL,
   headers: getHeaders(),
-  body: JSON.stringify(getBody(city, limitCount, offsetCount))
-})
+  body: JSON.stringify(getBody(city, limitCount, offsetCount)),
+});
 
 const getToken = async () => {
   try {
     return new Promise((resolve, reject) => {
       request(TOKEN_OPTIONS, async function (err, res) {
         if (err) {
-          reject(null)
+          reject(null);
         }
-        let responseJSON = JSON.parse(res.body)
-        resolve(responseJSON)
-      })
-    })
+        let responseJSON = JSON.parse(res.body);
+        resolve(responseJSON);
+      });
+    });
   } catch (error) {
-    return null
+    return null;
   }
-}
+};
 
-async function getAllListings () {
-  const cityKeys = ['toronto-on', 'vancouver-bc', 'ottawa-on']
-  tokenObj = await getToken()
+async function getAllListings() {
+  const cityKeys = ["toronto-on", "vancouver-bc", "ottawa-on"];
+  tokenObj = await getToken();
   if (tokenObj) {
     for (const city of cityKeys) {
-      let data = await getPadMapperDataPerCity(city)
-      console.log(data)
+      let data = await getPadMapperDataPerCity(city);
     }
-    return []
+    return [];
   } else {
-    console.log('Unable  to get the token')
+    console.log("Unable  to get the token");
   }
 }
 
-async function getPadMapperDataPerCity (city) {
+async function getPadMapperDataPerCity(city) {
   return new Promise(async (resolve, reject) => {
     request(getOptions(city), async (error, response) => {
       if (error) {
-        console.log('Error fetching the data for city: ', city)
+        console.log("Error fetching the data for city: ", city);
       }
-      const listingChunk = Math.ceil(JSON.parse(response.body).matching / 50)
-      let refinedListings = []
-      const limit = 50
+      const totalRecords = JSON.parse(response.body).matching;
+      const listingChunk = Math.ceil(totalRecords / 50);
+      let refinedListings = [];
+      const limit = 50;
       for (i = 0; i < listingChunk; i++) {
-        await doRequest(limit, limit * i, city)
-          .then(res => {
-            if (res && Array.isArray(res)) {
-              for (let listing of res) {
-                refinedListings.push(listing)
-              }
-            }
-          })
-          .catch(error =>
-            console.log('Error while getting the listings at limit: ' + limit)
-          )
+        const newLimit =
+          totalRecords / (limit * (i + 1)) >= 1
+            ? limit
+            : totalRecords - limit * i;
+        const res = await doRequest(newLimit, limit * i, city);
+        if (res && Array.isArray(res)) {
+          for (let listing of res) {
+            refinedListings.push(listing);
+          }
+        }
       }
       try {
-        let formattedData = formatPadMapperData(refinedListings)
-        var ops = []
-        var counter = 0
-        let data
-        formattedData.forEach(function (data) {
-          ops.push({
-            updateOne: {
-              filter: {
-                id: data.id
-              },
-              update: { $set: data },
-              upsert: true
-            }
-          })
-          counter++
-
-          if (counter % 100 == 0) {
-            collection.bulkWrite(ops, function (err, r) {})
-            ops = []
-          }
-        })
-        resolve(data)
+        let formattedData = formatPadMapperData(refinedListings);
+        collection.insertMany(formattedData);
+        resolve("");
       } catch (e) {
-        reject(e)
+        reject(e);
       }
-    })
-  })
+    });
+  });
 }
 
-function doRequest (limitCount, offSetCount, city) {
-  return new Promise((resolve, reject) => {
-    request(getOptions(city, limitCount, offSetCount), function (
-      error,
-      res,
-      body
-    ) {
-      try {
-        resolve(JSON.parse(body).listables)
-      } catch (parseError) {
-        reject(parseError)
-      }
-    })
-  })
+async function doRequest(limitCount, offSetCount, city) {
+  try {
+    const options = getOptions(city, limitCount, offSetCount);
+    const res = await axios.post(options.url, JSON.parse(options.body), {
+      headers: options.headers,
+    });
+    return res.data.listables;
+  } catch (error) {
+    return [];
+  }
 }
 
 const fetchPadMapperData = (databaseCollection = null) => {
   if (databaseCollection) {
-    collection = databaseCollection
-    let data = getAllListings()
-    return data
+    collection = databaseCollection;
+    let data = getAllListings();
+    return data;
   }
-}
+};
 
-module.exports = { fetchPadMapperData }
+module.exports = { fetchPadMapperData };

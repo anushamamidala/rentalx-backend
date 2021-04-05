@@ -33,7 +33,7 @@ const routes = dbCollection => {
         findObj.city = cityName
       }
       if (noOfBedrooms > 0) {
-        findObj.bedsRange = { $in: [noOfBedrooms] }
+        findObj.bedsRange = { $in: [+noOfBedrooms] }
       }
       if (zipCode) {
         const postalCode =
@@ -74,7 +74,7 @@ const routes = dbCollection => {
       findObj.city = cityName
     }
     if (noOfBedrooms > 0) {
-      findObj.bedsRange = { $in: [noOfBedrooms] }
+      findObj.bedsRange = { $in: [+noOfBedrooms] }
     }
     if (zipCode) {
       const postalCode =
@@ -86,7 +86,6 @@ const routes = dbCollection => {
               .slice(0, 3)
       findObj.postalCode = { $regex: '.*' + postalCode + '.*' }
     }
-    console.log(findObj)
     const result = await dbCollection
       .aggregate([
         {

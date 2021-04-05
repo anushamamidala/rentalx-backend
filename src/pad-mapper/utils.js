@@ -28,7 +28,7 @@ const constructItem = (item = {}) => {
   if (item.max_bathrooms) {
     bathsRange.push(item.max_bathrooms)
   }
-  const dateUpdated = item.created_on || item.listed_on
+  const dateUpdated = item.modified_on || item.created_on || item.listed_on
 
   return {
     id,
