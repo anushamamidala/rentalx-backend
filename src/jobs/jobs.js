@@ -12,9 +12,24 @@ const scheduleFetchJob = () => {
       console.log("Done", res);
       console.log("Job ended");
     });
+    request("http://localhost:4000/api//fetchViewIt", async function (err, res) {
+      console.log("Done", res);
+      console.log("Job ended");
+    });
+  });
+};
+
+const scheduleFetchViewItJob = () => {
+  schedule.scheduleJob(rule, function () {
+    console.log("Job started");
+    request("http://localhost:4000/api//fetchViewIt", async function (err, res) {
+      console.log("Done", res);
+      console.log("Job ended");
+    });
   });
 };
 
 module.exports = {
   scheduleFetchJob,
+  scheduleFetchViewItJob,
 };
