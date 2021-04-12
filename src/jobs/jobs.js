@@ -12,6 +12,13 @@ const scheduleFetchJob = () => {
       console.log('Done', res)
       console.log('Job ended')
     })
+    request('http://localhost:4000/api//fetchViewIt', async function (
+      err,
+      res
+    ) {
+      console.log('Done', res)
+      console.log('Job ended')
+    })
   })
 }
 

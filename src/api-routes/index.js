@@ -15,6 +15,7 @@ const routes = dbCollection => {
     const cityName = request.body.cityName
     const noOfBedrooms = request.body.noOfBedrooms
     const zipCode = request.body.zipCode
+    const unitType = request.body.unitType
     let periods = ['today', 'week', 'month']
     let result = {
       listings_count: {},
@@ -33,7 +34,10 @@ const routes = dbCollection => {
         findObj.city = cityName
       }
       if (noOfBedrooms > 0) {
-        findObj.bedsRange = { $in: [noOfBedrooms] }
+        findObj.bedsRange = { $in: [+noOfBedrooms] }
+      }
+      if (unitType) {
+        findObj.propertyType = unitType
       }
       if (zipCode) {
         const postalCode =
@@ -45,7 +49,6 @@ const routes = dbCollection => {
                 .slice(0, 3)
         findObj.postalCode = { $regex: '.*' + postalCode + '.*' }
       }
-      console.log(findObj)
       let padMapperListings = await dbCollection
         .find(findObj, { bedsRange: 1 })
         .toArray()
@@ -64,6 +67,7 @@ const routes = dbCollection => {
     const cityName = request.body.cityName
     const noOfBedrooms = request.body.noOfBedrooms
     const zipCode = request.body.zipCode
+    const unitType = request.body.unitType
     let matchDate = new Date(Date.now() - 30 * ONE_DAY).getTime() / 1000
     let findObj = {
       dateUpdated: {
@@ -74,7 +78,10 @@ const routes = dbCollection => {
       findObj.city = cityName
     }
     if (noOfBedrooms > 0) {
-      findObj.bedsRange = { $in: [noOfBedrooms] }
+      findObj.bedsRange = { $in: [+noOfBedrooms] }
+    }
+    if (unitType) {
+      findObj.propertyType = unitType
     }
     if (zipCode) {
       const postalCode =
@@ -86,7 +93,6 @@ const routes = dbCollection => {
               .slice(0, 3)
       findObj.postalCode = { $regex: '.*' + postalCode + '.*' }
     }
-    console.log(findObj)
     const result = await dbCollection
       .aggregate([
         {
@@ -110,12 +116,14 @@ const routes = dbCollection => {
   router.get('/fetch', (req, res) => {
     let data = fetchPadMapperData(dbCollection)
     res.send(data)
+    let data_viewIt = fetchViewItData(dbCollection)
+    res.send(data_viewIt)
   })
 
-  router.get('/fetchViewIt', (req, res) => {
-    let data = fetchViewItData(dbCollection)
-    res.send(data)
-  })
+  // router.get("/fetchViewIt", (req, res) => {
+  //   let data = fetchViewItData(dbCollection);
+  //   res.send(data);
+  // });
 }
 
 const databaseNotConnected = () => {
