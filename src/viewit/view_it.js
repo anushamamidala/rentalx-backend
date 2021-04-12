@@ -1,61 +1,36 @@
-const { lutimesSync } = require('fs')
 const request = require('request')
+const {
+  formatViewItData,
+  formatVancouverData,
+  formatOttawaData
+} = require('./viewit_data')
+const { formatData } = require('./utils')
+
 require('dotenv/config')
 
 const getHeaders = () => ({
   'Content-Type': 'application/json'
 })
 
-const getBody = () => ({
-  NELat: 44.071800467511565,
-  NELong: -79.11941528320314,
-  SWLat: 43.45690646829031,
-  SWLong: -79.86099243164064,
-  MapCenterLat: 43.765143524274066,
-  MapCenterLng: -79.49020385742189,
-  MapZoom: 10,
-  minPrice: 1,
-  maxPrice: 50000,
-  room: true,
-  bachelor: false,
-  room1: false,
-  room2: false,
-  room3: false,
-  furnished: true,
-  unfurnished: true,
-  loft: false,
-  basement: true,
-  retirement: false,
-  ShortTerm: false,
-  AC: false,
-  FridgeStove: false,
-  Parking: false,
-  Balcony: false,
-  Pets: false,
-  Cats: false,
-  Fireplace: false,
-  Laundary: false,
-  Yard: false,
-  Dishwasher: false,
-  Exerciseroom: false,
-  Pool: false,
-  Deck: false,
-  sFilterText: '',
-  iCityID: 51,
-  MapSettings: '43.765143524274066,-79.49020385742189,10,1'
-})
-
-const OPTIONS = {
-  method: 'POST',
-  url: process.env.VIEW_IT_API_URL,
-  headers: getHeaders(),
-  body: JSON.stringify(getBody())
+const getViewItListings = async body => {
+  let response = []
+  for (let i = 0; i < body.length; i++) {
+    const OPTIONS = {
+      method: 'POST',
+      url: process.env.VIEW_IT_API_URL,
+      headers: getHeaders(),
+      body: JSON.stringify(body[i])
+    }
+    let resp = await getViewItData(OPTIONS)
+    response.push(resp)
+  }
+  return response
 }
 
-const getViewItData = async () => {
+const getViewItData = async reqOptions => {
   try {
     return new Promise((resolve, reject) => {
-      request(OPTIONS, async function (err, res) {
+      request(reqOptions, async function (err, res) {
         if (err) {
           reject(null)
         }
@@ -69,25 +44,44 @@ const getViewItData = async () => {
 }
 
 async function getAllListings () {
-  let allListings = await getViewItData()
-  if (allListings.d) {
-    for (const listing of allListings.d) {
-      let id = listing.iVit || ''
-      let address = listing.Address || ''
-      let postalCode = listing
-      let lat = listing.Latitude
-      let long = listing.Longitude
-      let city = listing.City
-      let minPrice = 0
-      let maxPrice = listing.Price
-      let avgPrice = listing.Price / 2
-      let bedsRange = listing.Bedroom === 0 ? 1 : listing.Bedroom
-      let bathsRange = ''
-      let dateUpdated = ''
-      let propertyType = 'Apartment'
+  let listings = []
+  // Toronto
+  let body = formatViewItData()
+  let torontoListings = await getViewItListings(body)
+  for (let i = 0; i < torontoListings.length; i++) {
+    if (torontoListings[i].d) {
+      listings = [...listings, ...formatData(torontoListings[i].d, 'Toronto')]
+    } else {
+      console.log('Unable  to get the data')
     }
-  } else {
-    console.log('Unable  to get the data')
+  }
+  // Vancouver
+  body = formatVancouverData()
+  let vancouverListings = await getViewItListings(body)
+  for (let i = 0; i < vancouverListings.length; i++) {
+    if (vancouverListings[i].d) {
+      listings = [
+        ...listings,
+        ...formatData(vancouverListings[i].d, 'Vancouver')
+      ]
+    } else {
+      console.log('Unable  to get the data')
+    }
+  }
+  //Ottawa
+  body = formatOttawaData()
+  let ottawaListings = await getViewItListings(body)
+  for (let i = 0; i < ottawaListings.length; i++) {
+    if (ottawaListings[i].d) {
+      listings = [...listings, ...formatData(ottawaListings[i].d, 'Ottawa')]
+    } else {
+      console.log('Unable  to get the data')
+    }
+  }
+  try {
+    collection.insertMany(listings)
+  } catch (e) {
+    console.log(e)
   }
 }
 

@@ -105,7 +105,8 @@ const routes = dbCollection => {
     response.send(result)
   })
 
-  // MARK: To be replaced with agenda
+  // Fetch will get all the records from the padmapper, viewIt and rentals
+  // This is called in the jobs scheduler to fetch the data
   router.get('/fetch', (req, res) => {
     let data = fetchPadMapperData(dbCollection)
     res.send(data)
@@ -123,7 +124,7 @@ const databaseNotConnected = () => {
 
 db.initialize(
   process.env.DATABASE_NAME,
-  process.env.PAD_MAPPER_COLLECTION_NAME,
+  process.env.RENTALS_COLLECTION_NAME,
   routes,
   databaseNotConnected
 )
