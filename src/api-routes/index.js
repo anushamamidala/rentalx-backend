@@ -107,11 +107,10 @@ const routes = (dbCollection) => {
 
   // MARK: To be replaced with agenda
   router.get("/fetch", (req, res) => {
-    let data;
-    let data_viewIt;
-    data = fetchPadMapperData(dbCollection);
+    
+   let data = fetchPadMapperData(dbCollection);
     res.send(data);
-    data_viewIt = fetchViewItData(dbCollection);
+   let data_viewIt = fetchViewItData(dbCollection);
     res.send(data_viewIt);
   });
 
