@@ -72,6 +72,9 @@ const routes = dbCollection => {
     let findObj = {
       dateUpdated: {
         $gt: Math.floor(matchDate)
+      },
+      minPrice: {
+        $gt: 1
       }
     }
     if (cityName) {
@@ -119,11 +122,6 @@ const routes = dbCollection => {
     let data_viewIt = fetchViewItData(dbCollection)
     res.send(data_viewIt)
   })
-
-  // router.get("/fetchViewIt", (req, res) => {
-  //   let data = fetchViewItData(dbCollection);
-  //   res.send(data);
-  // });
 }
 
 const databaseNotConnected = () => {
