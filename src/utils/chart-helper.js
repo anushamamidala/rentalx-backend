@@ -1,14 +1,17 @@
 const moment = require("moment");
+const CONSTANTS = require('../constants/index')
 
+// Gets the days for the particular period
 const getDates = (period) => {
-  let days = period == "today" ? 1 : period === "week" ? 7 : 30;
+  let days = period == CONSTANTS.TODAY ? 1 : period === CONSTANTS.WEEK ? 7 : 30;
   let daysObj = {};
   for (let i = 1; i < days; i++) {
-    daysObj[moment().subtract(i, "days").format("MM/DD")] = 0;
+    daysObj[moment().subtract(i, CONSTANTS.DAYS).format("MM/DD")] = 0;
   }
   return daysObj;
 };
 
+// Returns data uploaded in 24 hours
 const constructTodaysData = (todayDates) => {
   const finalData = {};
   for (let i = 0; i <= 24; i++) {
@@ -24,11 +27,12 @@ const constructTodaysData = (todayDates) => {
   return finalData;
 };
 
+// Formating the returing data to match the data with the chart
 const getChartData = (records = [], period) => {
   const todayDates = [];
   let daysObj = getDates(period);
   for (let record of records) {
-    if (period === "today") {
+    if (period === CONSTANTS.TODAY) {
       todayDates.push(
         moment(record ? record.dateUpdated * 1000 : "").format("HH")
       );
@@ -41,14 +45,15 @@ const getChartData = (records = [], period) => {
       }
     }
   }
-  if (period === "today") {
+  if (period === CONSTANTS.TODAY) {
     return constructTodaysData(todayDates);
   }
   return daysObj;
 };
 
+// returns the overall data present
 const getOverallData = (records) => {
-  let daysObj = getDates("month");
+  let daysObj = getDates(CONSTANTS.MONTH);
   for (let record of records) {
     const currentDate = moment(record ? record.dateUpdated * 1000 : "").format(
       "MM/DD"

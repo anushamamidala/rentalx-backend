@@ -5,6 +5,7 @@ const { fetchViewItData } = require('../viewit/view_it')
 const { fetchPadMapperData } = require('../pad-mapper/pad-mapper')
 const { getChartData, getOverallData } = require('../utils/chart-helper')
 require('dotenv/config')
+const CONSTANTS = require('../constants/index')
 
 const routes = dbCollection => {
   // Method : POST
@@ -16,15 +17,14 @@ const routes = dbCollection => {
     const noOfBedrooms = request.body.noOfBedrooms
     const zipCode = request.body.zipCode
     const unitType = request.body.unitType
-    let periods = ['today', 'week', 'month']
+    let periods = CONSTANTS.PERIODS
     let result = {
       listings_count: {},
       chart_data: {}
     }
     for (let period of periods) {
-      let ONE_DAY = 24 * 60 * 60 * 1000
-      let days = period == 'today' ? 1 : period == 'week' ? 7 : 30
-      let matchDate = new Date(Date.now() - days * ONE_DAY).getTime() / 1000
+      let days = period == CONSTANTS.TODAY ? 1 : period == CONSTANTS.WEEK ? 7 : 30
+      let matchDate = new Date(Date.now() - days * CONSTANTS.ONE_DAY).getTime() / 1000
       let findObj = {
         dateUpdated: {
           $gt: Math.floor(matchDate)
@@ -63,12 +63,11 @@ const routes = dbCollection => {
   // Method : POST
   // Endpoint : BASE_URL/api/listings-price
   router.post('/listings-price', async (request, response) => {
-    let ONE_DAY = 24 * 60 * 60 * 1000
     const cityName = request.body.cityName
     const noOfBedrooms = request.body.noOfBedrooms
     const zipCode = request.body.zipCode
     const unitType = request.body.unitType
-    let matchDate = new Date(Date.now() - 30 * ONE_DAY).getTime() / 1000
+    let matchDate = new Date(Date.now() - 30 * CONSTANTS.ONE_DAY).getTime() / 1000
     let findObj = {
       dateUpdated: {
         $gt: Math.floor(matchDate)

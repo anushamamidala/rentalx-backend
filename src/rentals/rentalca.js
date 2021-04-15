@@ -83,7 +83,7 @@ async function getData () {
             }
           }
         })
-        .catch(error => console.log('------------------------------'))
+        .catch(error => console.log('Error', error))
     }
     try {
       collection.insertMany(refinedListings)
@@ -95,9 +95,6 @@ async function getData () {
 
 async function getAllRentalCAListings (i) {
   let res = await doRequest(i)
-  //   if (res.inculdes("Incapsula incident ID")) {
-  //     return null;
-  //   }
   return new Promise(function (resolve, reject) {
     if (res) {
       resolve(res)
@@ -129,24 +126,11 @@ function doRequest (pgNo) {
     request(options, function (error, res, body) {
       try {
         const parsedBody = JSON.parse(JSON.stringify(body))
-        //console.log(parsedBody);
         resolve(JSON.parse(body).data.listings)
       } catch (parseError) {
         console.log(parseError)
         reject(parseError)
-      }
-
-      //console.log(body);
-      // if (
-      //   !error &&
-      //   res.statusCode == 200
-      //   //!body.includes("Request unsuccessful")
-      // ) {
-      //   console.log(body);
-      //   resolve(JSON.parse(body).data.listings);
-      // } else {
-      //   reject(error);
-      // }
+      }      
     })
   })
 }

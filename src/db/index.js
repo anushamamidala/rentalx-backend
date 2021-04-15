@@ -1,6 +1,10 @@
 const MongoClient = require("mongodb").MongoClient;
 require("dotenv/config");
 
+// Connect to the Mongo Database cloud using connection string defined
+// in the env file.Details like name of the DB and collection are
+// also sent to the initialize() method for establishing connection.
+
 function initialize(
   dbName,
   dbCollectionName,
@@ -8,14 +12,11 @@ function initialize(
   failureCallback
 ) {
   MongoClient.connect(process.env.MONGO_CONNECT, function (err, dbInstance) {
-    if (err) {
-      console.log(`[MongoDB connection] ERROR: ${err}`);
+    if (err) {  
       failureCallback(err);
     } else {
       const dbObject = dbInstance.db(dbName);
       const dbCollection = dbObject.collection(dbCollectionName);
-      console.log("[MongoDB connection] SUCCESS");
-
       successCallback(dbCollection);
     }
   });

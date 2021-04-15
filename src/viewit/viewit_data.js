@@ -1,6 +1,7 @@
 const formatViewItData = (list = []) => {
   data = []
-  // Toronto
+
+  // Building data item for passing it to the client for Toronto Location.
   let item = {
     NELat: 44.071800467511565,
     NELong: -79.11941528320314,
@@ -41,7 +42,7 @@ const formatViewItData = (list = []) => {
   }
   data.push(item)
 
-  //Toronto T1:
+  // Building data item for passing it to the client for Toronto T1 location:
   item = {
     NELat: 43.694500598764876,
     NELong: -79.37089920043947,
@@ -82,7 +83,7 @@ const formatViewItData = (list = []) => {
   }
   data.push(item)
 
-  //TorontoT2
+  // Building data item for passing it to the client for Toronto(T2) location
   item = {
     NELat: 43.71472824383735,
     NELong: -79.39776420593263,
@@ -123,7 +124,7 @@ const formatViewItData = (list = []) => {
   }
   data.push(item)
 
-  //TorontoT3
+  // Building data item for passing it to the client for Toronto(T3) location
   item = {
     NELat: 43.749769193052295,
     NELong: -79.30395126342775,
@@ -164,7 +165,7 @@ const formatViewItData = (list = []) => {
   }
   data.push(item)
 
-  //TorontoT4
+  // Building data item for passing it to the client for Toronto(T4) location
   item = {
     NELat: 43.69270087644112,
     NELong: -79.42222595214845,
@@ -205,7 +206,7 @@ const formatViewItData = (list = []) => {
   }
   data.push(item)
 
-  //TorontoT5
+  // Building data item for passing it to the client for Toronto(T5) location
   item = {
     NELat: 43.67426612847256,
     NELong: -79.38557624816896,
@@ -246,7 +247,7 @@ const formatViewItData = (list = []) => {
   }
   data.push(item)
 
-  //TorontoT6
+  // Building data item for passing it to the client for Toronto(T6) location
   item = {
     NELat: 43.69865837138954,
     NELong: -79.27906036376955,
@@ -287,8 +288,7 @@ const formatViewItData = (list = []) => {
   }
   data.push(item)
 
-  //EtobicokeE1
-
+  // Building data item for passing it to the client for Etobicoke(E1) location
   item = {
     NELat: 43.67426612847256,
     NELong: -79.38557624816896,
@@ -329,7 +329,7 @@ const formatViewItData = (list = []) => {
   }
   data.push(item)
 
-  //EtobicokeE2
+  // Building data item for passing it to the client for Etobicoke(E2) location
   item = {
     NELat: 43.652720712083266,
     NELong: -79.47835922241212,
@@ -370,7 +370,7 @@ const formatViewItData = (list = []) => {
   }
   data.push(item)
 
-  //North York N1
+  //Building data item for passing it to the client for North York(N1) location
   item = {
     NELat: 43.81867485545323,
     NELong: -79.42943572998048,
@@ -411,7 +411,7 @@ const formatViewItData = (list = []) => {
   }
   data.push(item)
 
-  //North York N2
+  //Building data item for passing it to the client for North York(N2) location
   item = {
     NELat: 43.79699548733474,
     NELong: -79.37965393066408,
@@ -452,7 +452,7 @@ const formatViewItData = (list = []) => {
   }
   data.push(item)
 
-  //North York N3
+ //Building data item for passing it to the client for North York(N3) location
   item = {
     NELat: 43.84963173160688,
     NELong: -79.25811767578126,
@@ -492,7 +492,8 @@ const formatViewItData = (list = []) => {
     MapSettings: '43.77282920862387,-79.35090065002443,12,1'
   }
   data.push(item)
-  //Scarborough S1
+
+  //Building data item for passing it to the client for Scarborough(S1)location
   item = {
     NELat: 43.86993071959571,
     NELong: -79.1939163208008,
@@ -532,7 +533,8 @@ const formatViewItData = (list = []) => {
     MapSettings: '43.79326284805562,-79.28661346435548,12,1'
   }
   data.push(item)
-  //Scarborough S2
+
+  //Building data item for passing it to the client for Scarborough(S2)location
   item = {
     NELat: 43.862752599074504,
     NELong: -79.11666870117189,
@@ -572,7 +574,8 @@ const formatViewItData = (list = []) => {
     MapSettings: '43.78596696172773,-79.20936584472658,12,1'
   }
   data.push(item)
-  //Scarborough S3
+
+  //Building data item for passing it to the client for Scarborough(S3)location
   item = {
     NELat: 43.843194024103035,
     NELong: -79.11563873291017,
@@ -614,6 +617,8 @@ const formatViewItData = (list = []) => {
   data.push(item)
   return data
 }
+
+//Building data item for passing it to the client for Vancouver location.
 
 const formatVancouverData = (list = []) => {
   data = []
@@ -659,6 +664,7 @@ const formatVancouverData = (list = []) => {
   return data
 }
 
+//Building data item for passing it to the client for Ottawa location.
 const formatOttawaData = (list = []) => {
   data = []
   let item = {

@@ -3,6 +3,7 @@ const { formatPadMapperData } = require("./utils");
 const axios = require("axios");
 require("dotenv/config");
 
+// Build token options with url as padmapper and method:GET
 const TOKEN_OPTIONS = {
   method: "GET",
   url: process.env.PAD_MAPPER_API_TOKEN_URL,
@@ -17,6 +18,9 @@ const getHeaders = () => ({
   "X-Zumper-XZ-Token": tokenObj.xz_token,
 });
 
+// city | Type: String | Values: ["Toronto", "Ottawa", "Vancouver"]
+// propertyCategories | Type: String | Values: ["apartment", "condo", "house", "room"]
+
 const getBody = (city, limit, offsetCount) => ({
   external: true,
   longTerm: true,
@@ -30,6 +34,9 @@ const getBody = (city, limit, offsetCount) => ({
   offset: offsetCount || 0,
   propertyCategories: ["apartment", "condo", "house", "room"],
 });
+
+// Method : POST
+// Endpoint : PAD_MAPPER_API_DATA_URL
 
 const getOptions = (city, limitCount, offsetCount) => ({
   method: "POST",
@@ -54,6 +61,9 @@ const getToken = async () => {
   }
 };
 
+// Build all the listings for the locations from pad-mapper calling method getPadMapperDataPerCity()
+// cityKeys: Optional | Type: String | Values: ["toronto-on", "vancouver-bc", "ottawa-on"]
+
 async function getAllListings() {
   const cityKeys = ["toronto-on", "vancouver-bc", "ottawa-on"];
   tokenObj = await getToken();
@@ -66,6 +76,8 @@ async function getAllListings() {
     console.log("Unable  to get the token");
   }
 }
+
+// Gets all the listings for a particular city
 
 async function getPadMapperDataPerCity(city) {
   return new Promise(async (resolve, reject) => {
