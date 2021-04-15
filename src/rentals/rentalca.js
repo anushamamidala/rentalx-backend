@@ -21,19 +21,11 @@ app.listen(5000, () => {
       throw error
     }
     database = client.db('test')
-    collection = database.collection('rentals')
+    collection = database.collection('listings')
     console.log('Connected to `' + 'test' + '`!')
     getData()
   })
 })
-
-async function fallAsleep (sleepTime) {
-  return new Promise((resolve, reject) => {
-    setTimeout(function () {
-      resolve()
-    }, sleepTime)
-  })
-}
 
 async function getData () {
   var options = {
@@ -63,6 +55,7 @@ async function getData () {
                 const rentalAvg = arr =>
                   arr.reduce((a, b) => a + b, 0) / arr.length
                 let rentalObj = {
+                  site: 'rentals.ca',
                   id: rental.id,
                   address: rental.address1,
                   addressDetail: rental.address2,
@@ -71,8 +64,8 @@ async function getData () {
                   city: 'Toronto', //get the city name with the help of Id
                   propertyType: rental.property_type,
                   rentRange: rental.rent_range,
-                  minPrice: Math.min(rental.rent_range),
-                  maxPrice: Math.max(rental.rent_range),
+                  minPrice: Math.min.apply(Math, rental.rent_range),
+                  maxPrice: Math.max.apply(Math, rental.rent_range),
                   avgPrice: rentalAvg(rental.rent_range),
                   bedsRange: rental.beds_range,
                   bathsRange: rental.baths_range,
@@ -130,7 +123,7 @@ function doRequest (pgNo) {
       } catch (parseError) {
         console.log(parseError)
         reject(parseError)
-      }      
+      }
     })
   })
 }

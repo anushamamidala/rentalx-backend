@@ -1,4 +1,5 @@
 const constructItem = (item = {}) => {
+  let site = 'padmapper'
   let id = item.listing_id || ''
   let address = item.address || ''
   let postalCode = item.zipcode || ''
@@ -31,6 +32,7 @@ const constructItem = (item = {}) => {
   const dateUpdated = item.modified_on || item.created_on || item.listed_on
 
   return {
+    site,
     id,
     address,
     postalCode,

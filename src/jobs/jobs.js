@@ -1,23 +1,37 @@
 const schedule = require('node-schedule')
 const request = require('request')
+const { sendEmailOnError } = require('./email')
 
-const rule = new schedule.RecurrenceRule()
-rule.hour = 3
-rule.minute = 0
-
-// Scheduled jobs 
+// Scheduled jobs
 
 const scheduleFetchJob = () => {
-  schedule.scheduleJob(rule, function () {
-    console.log('Job started')
-    request('https://rentalx.herokuapp.com/api/fetch', async function (err, res) {
-      console.log('Done', res)
-    })
-    request('https://rentalx.herokuapp.com/api//fetchViewIt', async function (
+  console.log('JOB STARTED')
+  schedule.scheduleJob('0 2 * * *', function () {
+    console.log('JOB STARTED at----')
+    request('https://rentalx.herokuapp.com/api/fetch', async function (
       err,
       res
     ) {
-      console.log('Done', res)
+      console.log('res err', res, err)
+      if (res) {
+        console.log(res)
+        sendEmailOnError('Success', JSON.stringify(res))
+      }
+      if (err) {
+        console.log(err)
+        sendEmailOnError('Error', JSON.stringify(err))
+      }
+    })
+    request('https://rentalx.herokuapp.com/api/fetchViewIt', async function (
+      err,
+      res
+    ) {
+      if (res) {
+        sendEmailOnError('Success', JSON.stringify(res))
+      }
+      if (err) {
+        sendEmailOnError('Error', JSON.stringify(err))
+      }
     })
   })
 }

@@ -23,8 +23,10 @@ const routes = dbCollection => {
       chart_data: {}
     }
     for (let period of periods) {
-      let days = period == CONSTANTS.TODAY ? 1 : period == CONSTANTS.WEEK ? 7 : 30
-      let matchDate = new Date(Date.now() - days * CONSTANTS.ONE_DAY).getTime() / 1000
+      let days =
+        period == CONSTANTS.TODAY ? 1 : period == CONSTANTS.WEEK ? 7 : 30
+      let matchDate =
+        new Date(Date.now() - days * CONSTANTS.ONE_DAY).getTime() / 1000
       let findObj = {
         dateUpdated: {
           $gt: Math.floor(matchDate)
@@ -67,7 +69,8 @@ const routes = dbCollection => {
     const noOfBedrooms = request.body.noOfBedrooms
     const zipCode = request.body.zipCode
     const unitType = request.body.unitType
-    let matchDate = new Date(Date.now() - 30 * CONSTANTS.ONE_DAY).getTime() / 1000
+    let matchDate =
+      new Date(Date.now() - 30 * CONSTANTS.ONE_DAY).getTime() / 1000
     let findObj = {
       dateUpdated: {
         $gt: Math.floor(matchDate)
@@ -110,6 +113,117 @@ const routes = dbCollection => {
         }
       ])
       .toArray()
+    response.send(result)
+  })
+
+  router.post('/listings-count-avg', async (request, response) => {
+    const cityName = request.body.cityName
+    const noOfBedrooms = request.body.noOfBedrooms
+    const zipCode = request.body.zipCode
+    const unitType = request.body.unitType
+    let result = {
+      overall_data: []
+    }
+
+    let findObj = {
+      minPrice: {
+        $gt: 1
+      }
+    }
+    if (cityName) {
+      findObj.city = cityName
+    }
+    if (noOfBedrooms > 0) {
+      findObj.bedsRange = { $in: [+noOfBedrooms] }
+    }
+    if (unitType) {
+      findObj.propertyType = unitType
+    }
+    if (zipCode) {
+      const postalCode =
+        zipCode.trim().toUpperCase().length === 3
+          ? zipCode.trim().toUpperCase()
+          : zipCode
+              .trim()
+              .toUpperCase()
+              .slice(0, 3)
+      findObj.postalCode = { $regex: '.*' + postalCode + '.*' }
+    }
+    let padMapperListings = await dbCollection
+      .aggregate([
+        {
+          $match: findObj
+        },
+        {
+          $group: {
+            _id: {
+              year: {
+                $year: {
+                  $add: [new Date(0), { $multiply: [1000, '$dateUpdated'] }]
+                }
+              },
+              month: {
+                $month: {
+                  $add: [new Date(0), { $multiply: [1000, '$dateUpdated'] }]
+                }
+              }
+            },
+            average: { $avg: '$avgPrice' }
+          }
+        }
+      ])
+      .toArray()
+    result.overall_data = padMapperListings
+    response.send(result)
+  })
+
+  router.post('/listings-count-prop-type', async (request, response) => {
+    const cityName = request.body.cityName
+    const noOfBedrooms = request.body.noOfBedrooms
+    const zipCode = request.body.zipCode
+    const unitType = request.body.unitType
+    let result = {
+      overall_data: []
+    }
+
+    let findObj = {
+      minPrice: {
+        $gt: 1
+      }
+    }
+    if (cityName) {
+      findObj.city = cityName
+    }
+    if (noOfBedrooms > 0) {
+      findObj.bedsRange = { $in: [+noOfBedrooms] }
+    }
+    if (unitType) {
+      findObj.propertyType = unitType
+    }
+    if (zipCode) {
+      const postalCode =
+        zipCode.trim().toUpperCase().length === 3
+          ? zipCode.trim().toUpperCase()
+          : zipCode
+              .trim()
+              .toUpperCase()
+              .slice(0, 3)
+      findObj.postalCode = { $regex: '.*' + postalCode + '.*' }
+    }
+    let padMapperListings = await dbCollection
+      .aggregate([
+        {
+          $match: findObj
+        },
+        {
+          $group: {
+            _id: '$propertyType',
+            average: { $avg: '$avgPrice' }
+          }
+        }
+      ])
+      .toArray()
+    result.overall_data = padMapperListings
     response.send(result)
   })
 
